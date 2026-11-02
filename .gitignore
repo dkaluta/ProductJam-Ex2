@@ -12,6 +12,9 @@ dist/
 supabase/.temp/
 supabase/.branches/
 
+# Track migrations even when a global Git ignore excludes SQL files.
+!supabase/migrations/**/*.sql
+
 # Secrets - never commit these.
 # Copy the .example files and fill in your own values.
 .env
