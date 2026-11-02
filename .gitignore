@@ -24,6 +24,9 @@ supabase/.branches/
 .DS_Store
 .vscode/*
 !.vscode/extensions.json
+.nova/*
+!.nova/Configuration.json
+!.nova/Tasks/
 .idea/
 
 # Logs

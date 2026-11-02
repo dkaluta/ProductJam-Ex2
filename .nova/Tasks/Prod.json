@@ -1,0 +1,17 @@
+{
+  "actions": {
+    "build": {
+      "enabled": true,
+      "script": "npm run build"
+    },
+    "clean": {
+      "enabled": true,
+      "script": "rm -rf dist .wrangler"
+    },
+    "run": {
+      "enabled": true,
+      "script": "npm run deploy"
+    }
+  },
+  "buildBeforeRunning": false
+}

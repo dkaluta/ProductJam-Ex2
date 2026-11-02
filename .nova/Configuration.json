@@ -1,0 +1,9 @@
+{
+  "com.parkcedar.eslint.config.eslintConfigPath" : "eslint.config.js",
+  "com.parkcedar.eslint.config.eslintPath" : "node_modules\/.bin\/eslint",
+  "prettier.format-on-save" : "Enable",
+  "prettier.module.path" : "\/Users\/dk\/Developer\/Personal\/ProductJam-Ex2\/node_modules\/prettier",
+  "workspace.name" : "ProductJam-Ex2",
+  "workspace.preview_append_paths" : false,
+  "workspace.preview_url" : "http:\/\/localhost:3000"
+}
