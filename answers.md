@@ -43,6 +43,7 @@ use the same pure functions?
 
 **Answer:**
 
+
 ## 3. Cheating
 
 Send your server a game that could never have been played, for example one

@@ -1,6 +1,6 @@
 -- 1. Create custom enums safely
 do $$ begin
-		create type game_outcome as enum ('game_won', 'draw', 'in_progress');
+		create type game_outcome as enum ('in_progress', 'game_won', 'draw');
 exception
 		when duplicate_object then null;
 end $$;
@@ -12,29 +12,29 @@ exception
 end $$;
 
 -- 2. Create the table
-create table if not exists public.tictactoe (
-		-- Board ID
+create table if not exists public.games (
+		-- Primary key
 		id uuid primary key default gen_random_uuid(),
 		
-		-- Board owner's user ID (defaults to the currently authenticated user in Supabase)
+		-- Owner reference (defaults to authenticated caller in Supabase)
 		owner_id uuid not null references auth.users (id) on delete cascade default auth.uid(),
 		
-		-- A representation of the 4x4 board as a fixed-length string of 16 characters
+		-- Board representation as a fixed-length string of 16 characters
 		board char(16) not null default '________________',
 		
-		-- Game lifecycle state
+		-- Game lifecycle outcome
 		outcome game_outcome not null default 'in_progress',
 		
-		-- Next player to move (null once the match finishes)
+		-- Next player to move; null once match finishes
 		turn player_mark null default 'X',
 		
-		-- Mark of the winning player (null if in_progress or draw)
+		-- Winner mark; null if in_progress or draw
 		winner player_mark null,
 		
-		-- The 4 coordinates that formed the winning line (null if in_progress or draw)
+		-- 4 winning indices; null if in_progress or draw
 		winning_line smallint[] null,
 		
-		-- Ordered sequence of moves played (e.g., [0, 5, 10, ...])
+		-- Ordered sequence of played positions
 		moves smallint[] not null default '{}',
 		
 		-- Generated total move count
@@ -45,7 +45,7 @@ create table if not exists public.tictactoe (
 		updated_at timestamptz not null default now(),
 		completed_at timestamptz null,
 		
-		-- Consistency constraints
+		-- Constraints matching design spec
 		constraint check_board_length check (char_length(board) = 16),
 		
 		constraint check_winner_and_status check (
@@ -64,40 +64,40 @@ begin
 end;
 $$ language plpgsql;
 
-drop trigger if exists set_tictactoe_updated_at on public.tictactoe;
-create trigger set_tictactoe_updated_at
-		before update on public.tictactoe
+drop trigger if exists set_games_updated_at on public.games;
+create trigger set_games_updated_at
+		before update on public.games
 		for each row
 		execute function public.handle_updated_at();
 
 -- 4. Enable Row Level Security (RLS)
-alter table public.tictactoe enable row level security;
+alter table public.games enable row level security;
 
--- Policies: Users have full CRUD access to their own boards
+-- Policies: Users have full CRUD access to their own games
 create policy "Users can view their own games"
-		on public.tictactoe
+		on public.games
 		for select
 		using (auth.uid() = owner_id);
 
 create policy "Users can create their own games"
-		on public.tictactoe
+		on public.games
 		for insert
 		with check (auth.uid() = owner_id);
 
 create policy "Users can update their own games"
-		on public.tictactoe
+		on public.games
 		for update
 		using (auth.uid() = owner_id)
 		with check (auth.uid() = owner_id);
 
 create policy "Users can delete their own games"
-		on public.tictactoe
+		on public.games
 		for delete
 		using (auth.uid() = owner_id);
 
--- 5. Helpful indexes
-create index if not exists idx_tictactoe_owner_outcome 
-		on public.tictactoe (owner_id, outcome);
+-- 5. Indexes for fast listing and filtering
+create index if not exists idx_games_owner_outcome 
+		on public.games (owner_id, outcome);
 
-create index if not exists idx_tictactoe_owner_created 
-		on public.tictactoe (owner_id, created_at desc);
+create index if not exists idx_games_owner_created 
+		on public.games (owner_id, created_at desc);
