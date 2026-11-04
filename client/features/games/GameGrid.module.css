@@ -1,0 +1,61 @@
+.artGrid {
+  display: grid;
+  list-style: none;
+  margin: 0;
+  padding: var(--space-6);
+  gap: var(--space-6);
+}
+.artGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 12rem), 1fr));
+}
+.artCard {
+  display: block;
+  inline-size: 100%;
+  padding: var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+  color: var(--color-text);
+}
+.artCard:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-border);
+}
+.artCard:active {
+  background: var(--color-surface-active);
+}
+.artCard:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+.artTitle {
+  display: block;
+  font-weight: 600;
+  margin-block: var(--space-3) var(--space-1);
+}
+.artStatus {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .artGrid {
+    padding: var(--space-3);
+    gap: var(--space-2);
+  }
+  .artGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .artTitle,
+  .artStatus {
+    font-size: var(--text-xs);
+  }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .artTitle {
+    font-size: var(--text-sm);
+  }
+}

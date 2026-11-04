@@ -1,0 +1,67 @@
+.board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  aspect-ratio: 1;
+  inline-size: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-border);
+  gap: 1px;
+  container-type: inline-size;
+}
+.cell {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: 13cqi;
+  font-weight: 500;
+  line-height: 1;
+  aspect-ratio: 1;
+}
+.cross {
+  color: var(--color-accent);
+}
+.circle {
+  color: var(--color-text);
+}
+.winner {
+  background: var(--color-success-subtle);
+  color: var(--color-success);
+}
+button.cell:enabled {
+  cursor: pointer;
+}
+button.cell:enabled:hover {
+  background: var(--color-surface-hover);
+}
+button.cell:enabled:active {
+  background: var(--color-surface-active);
+}
+button.cell:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: -4px;
+}
+.line {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+}
+.line line {
+  stroke: var(--color-success);
+  stroke-width: 6;
+  stroke-linecap: round;
+  opacity: 0.65;
+}
+.mark {
+  inline-size: 62%;
+  block-size: 62%;
+  overflow: visible;
+}

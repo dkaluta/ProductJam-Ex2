@@ -124,3 +124,32 @@
   --content-width: 60rem;
   --content-width-narrow: 34rem;
 }
+
+:root {
+  --scrollbar-thumb: var(--color-border-strong);
+  --scrollbar-track: var(--color-surface);
+  --scrollbar-hover: var(--color-text-muted);
+  --scrollbar-active: var(--color-text);
+}
+
+:root {
+  /* Cover Flow's dark stage is isolated from the light collection views. */
+  --color-coverflow-bg: #07080c;
+  --color-coverflow-horizon: #242733;
+  --color-coverflow-text: var(--color-text-on-accent);
+  --color-coverflow-muted: color-mix(
+    in oklab,
+    var(--color-coverflow-text) 72%,
+    var(--color-coverflow-bg)
+  );
+  --color-coverflow-active: color-mix(
+    in oklab,
+    var(--color-success) 55%,
+    var(--color-coverflow-text)
+  );
+  --color-coverflow-hover: color-mix(
+    in oklab,
+    var(--color-coverflow-text) 12%,
+    var(--color-coverflow-bg)
+  );
+}

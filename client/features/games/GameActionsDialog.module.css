@@ -1,0 +1,45 @@
+.gameActions {
+  max-inline-size: 32rem;
+  background: linear-gradient(155deg, var(--color-coverflow-horizon), var(--color-coverflow-bg));
+  color: var(--color-coverflow-text);
+  border: 1px solid var(--color-coverflow-muted);
+}
+.gameActions > h2 {
+  color: var(--color-coverflow-text);
+}
+.gameActions > p {
+  color: var(--color-coverflow-muted);
+}
+.actionThumbnail {
+  inline-size: 4rem;
+  margin-block-end: var(--space-4);
+}
+.actionRows {
+  display: grid;
+  border-block-start: 1px solid var(--color-coverflow-hover);
+}
+.actionRows button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-block-size: 3.25rem;
+  padding: var(--space-3) var(--space-2);
+  border: 0;
+  border-block-end: 1px solid var(--color-coverflow-hover);
+  border-radius: 0;
+  color: var(--color-coverflow-text);
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+}
+.actionRows button:hover {
+  background: var(--color-coverflow-hover);
+}
+.actionRows button:active {
+  background: var(--color-coverflow-horizon);
+}
+.actionRows button:focus-visible {
+  outline: 2px solid var(--color-coverflow-text);
+  outline-offset: -3px;
+}

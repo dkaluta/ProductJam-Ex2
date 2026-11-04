@@ -35,7 +35,7 @@ export const makeMove = (
   }
 
   const { position } = action;
-  if (position < 0 || position > 15) {
+  if (!Number.isInteger(position) || position < 0 || position > 15) {
     return { ok: false, error: "INVALID_POSITION" };
   }
 

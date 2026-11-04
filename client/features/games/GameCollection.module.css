@@ -1,0 +1,25 @@
+.browser {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: clip;
+  background: var(--color-surface);
+}
+.gridSlot,
+.browser[data-view="list"] .flowSlot,
+.browser[data-view="covers"] .flowSlot,
+.browser[data-view="covers"] .listSlot {
+  display: none;
+}
+.browser[data-view="covers"] .gridSlot {
+  display: block;
+}
+@media (orientation: landscape) and (pointer: coarse) {
+  .browser[data-view="flow"] .listSlot {
+    display: none;
+  }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .browser[data-view="flow"] .listSlot {
+    display: none;
+  }
+}

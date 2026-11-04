@@ -42,7 +42,7 @@ export class ApiRequestError extends Error {
 export async function api<T = unknown>(
   path: string,
   options: {
-    method?: "GET" | "POST" | "PATCH" | "DELETE";
+    method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
     /** A plain object - it gets turned into JSON for you. */
     body?: unknown;
     /** Use this instead of `body` when sending a file. */

@@ -42,7 +42,11 @@ gets, or return a new one? Why does it matter that your page and your server
 use the same pure functions?
 
 **Answer:**
-
+The appropriate function is `shared/game/transitions/makeMove`, and it does NOT
+modify the board, instead creating a new board (i.e. a pure function). It is 
+important for the front-end and the back-end to use shared functions due to
+them both being the rules of the same game: any deviation will mean frontend
+and backend will play separate games.
 
 ## 3. Cheating
 
@@ -53,6 +57,16 @@ Why does the server check the moves itself, if your own page always sends
 correct games? Which status code did your server answer, and why that one?
 
 **Answer:**
+The error code received is 400 Invalid Move, per the specification. The server
+checks the moves itself because fundamentally, the browser cannot be trusted 
+to give trustworthy grades. A useful analogy will be a pupil giving their 
+teacher a test with some answers filled and the grade 100 already there.
+
+The game given is a game where a user attempts to play the same cell twice.
+`400 Bad Request` was the specific request due to this request not conforming
+with the game's rules.
+
+![The request and the error it gives](./docs/screenshots/400_bad_request.png)
 
 ## 4. Someone else's games
 
@@ -64,6 +78,26 @@ How does your server know whose games to send? Which line in your code makes
 sure B never gets A's games, and what would B see without it?
 
 **Answer:**
+![Json content with games](./docs/screenshots/games_req.png)
+
+GET only gets games where owner ID of the game is equal to the user's ID.
+```
+.get("/", validate("query", listGamesSchema), async (c) => {
+	const { outcome } = c.req.valid("query");
+	let query = createAdminClient(c.env)
+	  .from("games")
+	  .select(COLUMNS)
+	  .eq("owner_id", c.get("user").id);
+	if (outcome === "in_progress") query = query.eq("outcome", outcome);
+	if (outcome === "completed")
+	  query = query.in("outcome", ["game_won", "draw"]);
+	const { data, error } = await query.order("created_at", {
+	  ascending: false,
+	});
+	if (error) return fail(c, 500, "database_error", "Could not load games.");
+	return c.json(data);
+  })
+```
 
 ## 5. When NASA fails
 
@@ -98,3 +132,9 @@ Describe one place in this assignment where an AI assistant gave you code that
 was wrong or insecure. How did you notice, and what did you change?
 
 **Answer:**
+AI gave code where it is trivial for a user to cheat via the console.
+This is done because the policy of updating the `public.games` table allows
+users to manipulate their own keys. 
+
+The fix is to disable INSERT, UPDATE, DELETE from the client side, instead
+letting only server side to do these changes.

@@ -73,27 +73,13 @@ create trigger set_games_updated_at
 -- 4. Enable Row Level Security (RLS)
 alter table public.games enable row level security;
 
--- Policies: Users have full CRUD access to their own games
+-- Browsers may only read their own games; the service-role API handles writes.
 create policy "Users can view their own games"
 		on public.games
 		for select
 		using (auth.uid() = owner_id);
 
-create policy "Users can create their own games"
-		on public.games
-		for insert
-		with check (auth.uid() = owner_id);
-
-create policy "Users can update their own games"
-		on public.games
-		for update
-		using (auth.uid() = owner_id)
-		with check (auth.uid() = owner_id);
-
-create policy "Users can delete their own games"
-		on public.games
-		for delete
-		using (auth.uid() = owner_id);
+-- No browser write policies: only the validated server API may mutate games.
 
 -- 5. Indexes for fast listing and filtering
 create index if not exists idx_games_owner_outcome 

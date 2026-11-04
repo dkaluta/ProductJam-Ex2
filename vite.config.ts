@@ -56,9 +56,32 @@ export default defineConfig(({ mode }) => {
     "VITE_",
   );
 
+  for (const name of Object.keys(env)) {
+    if (
+      /^VITE_.*(?:NASA_API_KEY|GEMINI_API_KEY|SUPABASE_SECRET_KEY)$/.test(name)
+    ) {
+      throw new Error(
+        `${name} is a private key and must not use a VITE_ prefix.`,
+      );
+    }
+  }
+
   return {
     plugins: [
       react(),
+      {
+        name: "server-code-stays-private",
+        transform(_code, id) {
+          if (
+            this.environment.name === "client" &&
+            id.startsWith(fileURLToPath(new URL("./server/", import.meta.url)))
+          ) {
+            throw new Error(
+              "Server modules must never be imported by the browser.",
+            );
+          }
+        },
+      },
       // Runs server/index.ts inside the real Cloudflare runtime during `vite dev`,
       // so local development behaves the same as production.
       //

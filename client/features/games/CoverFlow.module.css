@@ -1,0 +1,97 @@
+.flow {
+  min-inline-size: 0;
+}
+.stage {
+  position: relative;
+  block-size: calc(var(--card-size) * 1.36 + 4rem);
+  overflow: hidden;
+  perspective: 1000px;
+  touch-action: pan-y;
+  cursor: grab;
+}
+.stage:active {
+  cursor: grabbing;
+}
+.stage:focus-visible {
+  outline: 2px solid var(--color-coverflow-text);
+  outline-offset: -4px;
+}
+.cover {
+  position: absolute;
+  inset-block-start: var(--space-6);
+  inset-inline-start: 50%;
+  transform-style: preserve-3d;
+}
+.face {
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  user-select: none;
+}
+.face:hover {
+  border-color: var(--color-accent);
+}
+.face:active {
+  border-color: var(--color-accent-active);
+}
+.coverStatus {
+  display: block;
+  padding-block: var(--space-2) var(--space-1);
+  color: var(--color-text);
+  font-size: var(--text-sm);
+}
+.dim {
+  position: absolute;
+  inset: 0;
+  background: var(--color-coverflow-bg);
+  pointer-events: none;
+  border-radius: inherit;
+}
+.reflection {
+  position: absolute;
+  inset-inline: var(--space-2);
+  inset-block-start: calc(100% + 2px);
+  block-size: calc(var(--card-size) * 0.28);
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.24;
+  mask-image: linear-gradient(to bottom, black, transparent);
+}
+.reflectedBoard {
+  transform: scaleY(-1);
+}
+.navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  font: var(--text-sm) var(--font-mono);
+  color: var(--color-coverflow-muted);
+}
+.navigation button {
+  color: var(--color-coverflow-text);
+}
+.navigation button:enabled:hover {
+  background: var(--color-coverflow-hover);
+}
+.navigation button:focus-visible {
+  outline-color: var(--color-coverflow-text);
+}
+.navigation button:disabled {
+  color: var(--color-coverflow-muted);
+  opacity: 0.45;
+}
+@media (max-height: 600px) and (orientation: landscape) {
+  .stage {
+    block-size: calc(var(--card-size) * 1.36 + 3rem);
+  }
+  .cover {
+    inset-block-start: var(--space-2);
+  }
+}

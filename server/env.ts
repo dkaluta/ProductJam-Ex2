@@ -18,6 +18,8 @@ export type Bindings = {
   SUPABASE_SECRET_KEY: string;
   /** The API key for Gemini queries */
   GEMINI_API_KEY: string;
+  /** Gemini model ID configured on the server, e.g. from Google AI Studio. */
+  GEMINI_MODEL?: string;
   /** The API key for space photograph */
   NASA_API_KEY: string;
 };

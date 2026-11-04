@@ -1,0 +1,62 @@
+.coverArea {
+  padding-block: var(--space-4);
+}
+.selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-4) var(--space-2);
+  text-align: center;
+}
+.caption h2 {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+.caption p {
+  margin-block-start: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+.activeStatus {
+  color: var(--color-success);
+}
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  .coverArea {
+    padding-block: var(--space-2);
+  }
+  .selection {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-6);
+    text-align: start;
+  }
+}
+.coverArea {
+  background: radial-gradient(
+    ellipse at 50% 45%,
+    var(--color-coverflow-horizon),
+    var(--color-coverflow-bg) 80%
+  );
+  color: var(--color-coverflow-text);
+}
+.coverArea .caption p {
+  color: var(--color-coverflow-muted);
+}
+.coverArea .activeStatus {
+  color: var(--color-coverflow-active);
+}
+.coverArea .actions > button + button {
+  color: var(--color-coverflow-text);
+}
+.coverArea .actions > button + button:hover {
+  background: var(--color-coverflow-hover);
+}
+.coverArea .actions > button + button:focus-visible {
+  outline-color: var(--color-coverflow-text);
+}

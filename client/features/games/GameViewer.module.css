@@ -1,0 +1,15 @@
+.viewerBoard {
+  max-inline-size: 23rem;
+  margin-inline: auto;
+}
+.viewerLoading {
+  min-block-size: 23rem;
+  display: grid;
+  place-items: center;
+}
+.saveStatus {
+  min-block-size: 1.5rem;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}

@@ -1,0 +1,166 @@
+.gameList {
+  border-block-start: 1px solid var(--color-border);
+}
+.listHeading {
+  display: grid;
+  grid-template-columns: minmax(11rem, 2fr) minmax(10rem, 1.5fr) 4rem minmax(9rem, 1.5fr) 3rem;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+.rows {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-block-size: 24rem;
+  overflow: auto;
+  scrollbar-gutter: stable;
+}
+.row {
+  display: flex;
+  align-items: stretch;
+  border-block-end: 1px solid var(--color-border);
+}
+.row:last-child {
+  border-block-end: 0;
+}
+.row:nth-child(even) {
+  background: var(--color-bg);
+}
+.row[data-selected="true"] {
+  background: color-mix(in oklab, var(--color-accent) 10%, var(--color-surface));
+}
+.rowSelect {
+  flex: 1;
+  min-inline-size: 0;
+  display: grid;
+  grid-template-columns: minmax(11rem, 2fr) minmax(10rem, 1.5fr) 4rem minmax(9rem, 1.5fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-text);
+  text-align: start;
+  font-size: var(--text-sm);
+  cursor: pointer;
+}
+.rowSelect:hover,
+.openRow:hover {
+  background: var(--color-surface-hover);
+}
+.rowSelect:active,
+.openRow:active {
+  background: var(--color-surface-active);
+}
+.thumbnail {
+  display: none;
+}
+.rowName {
+  font-weight: 600;
+}
+.rowStatus,
+.rowDate,
+.rowMoves {
+  color: var(--color-text-muted);
+}
+.rowMoves {
+  font-family: var(--font-mono);
+}
+.mobileStatus {
+  display: none;
+}
+.openRow {
+  flex: 0 0 3rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  font-size: var(--text-lg);
+}
+.rowSelect:focus-visible,
+.openRow:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -3px;
+}
+@media (min-width: 601px) and (max-width: 900px) {
+  .listHeading {
+    grid-template-columns: minmax(8rem, 2fr) minmax(9rem, 1.5fr) 3rem 3rem;
+  }
+  .rowSelect {
+    grid-template-columns: minmax(8rem, 2fr) minmax(9rem, 1.5fr) 3rem;
+  }
+  .rowDate,
+  .listHeading span:nth-child(4) {
+    display: none;
+  }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .listHeading {
+    display: none;
+  }
+  .gameList {
+    border: 0;
+  }
+  .rows {
+    max-block-size: none;
+  }
+  .rowSelect {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--space-3);
+    gap: var(--space-3);
+  }
+  .thumbnail {
+    display: block;
+    inline-size: 4rem;
+  }
+  .rowName {
+    overflow-wrap: anywhere;
+  }
+  .mobileStatus {
+    display: block;
+    font-weight: 400;
+    color: var(--color-text-muted);
+    font-size: var(--text-xs);
+    margin-block-start: var(--space-1);
+  }
+  .rowStatus,
+  .rowMoves,
+  .rowDate {
+    display: none;
+  }
+  .row[data-selected="true"] {
+    background: transparent;
+  }
+}
+.gameList[data-standalone="true"] {
+  border-block-start: 0;
+}
+.rowIdentity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+.gameList[data-standalone="true"] .thumbnail {
+  display: block;
+  inline-size: 3rem;
+  flex: 0 0 3rem;
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  .gameList[data-standalone="true"] .thumbnail {
+    inline-size: 4rem;
+    flex-basis: 4rem;
+  }
+}
+.listHeading {
+  align-items: center;
+}
+.listHeading > button {
+  justify-content: flex-start;
+  padding-inline: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
