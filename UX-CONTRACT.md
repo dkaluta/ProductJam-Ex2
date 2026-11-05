@@ -91,3 +91,20 @@ component. Their styles live beside their owners. Shared responsive
 subscriptions live in `client/lib/useMediaQuery.ts`; game labels and date
 formatting live in `presentation.ts`. Small icons and internal carousel cards
 remain local to their owning component.
+
+## Space picture flow
+
+Source: Part 2 in `docs/design.md`, `shared/schemas/nasa.ts`, and
+`server/routes/nasa.ts`. `/space` requires login. New pictures explicitly
+replaces the random selection with four entries. Load more appends batches of up
+to four until 20 pictures are visible, preserving existing cards on failure.
+Videos and unavailable records are skipped. Shared Spinner owns initial loading;
+existing cards remain during refresh or refresh failure. No automatic random
+refresh or mutation retries. Picture cards own inline errors, image fallback,
+and explanation actions. A pending server claim shows Check explanation; users
+can check again without another generation. Saved Hebrew content uses RTL and
+`lang="he"`; English controls and date formatting follow the app locale. The
+server/database owns deduplication across users; browser hooks update the
+visible gallery after a successful explanation. Gallery, card, Hebrew
+explanation, and API hooks have separate owners under `client/features/space/`
+and reuse shared Button and Spinner primitives.

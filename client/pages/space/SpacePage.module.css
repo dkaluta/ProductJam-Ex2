@@ -1,0 +1,47 @@
+.page {
+  max-width: 72rem;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-block-end: var(--space-6);
+}
+.header h1 {
+  margin: 0;
+}
+.header p {
+  color: var(--color-text-muted);
+  max-width: 40rem;
+  margin-block-end: 0;
+}
+.header > button {
+  flex-shrink: 0;
+}
+.status {
+  min-height: 12rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+.note {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  margin-block: var(--space-4);
+}
+@media (max-width: 600px) {
+  .header {
+    flex-direction: column;
+    align-items: start;
+  }
+}
+
+.more {
+  margin-block-start: var(--space-6);
+  display: grid;
+  justify-items: center;
+  gap: var(--space-4);
+}

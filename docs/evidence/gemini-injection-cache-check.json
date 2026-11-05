@@ -1,0 +1,20 @@
+{
+  "date": "2025-05-14",
+  "checks": [
+    {
+      "table": "space_explanations",
+      "status": 200,
+      "rows": []
+    },
+    {
+      "table": "space_explanation_requests",
+      "status": 200,
+      "rows": [
+        {
+          "date": "2025-05-14",
+          "error_code": "gemini_unavailable"
+        }
+      ]
+    }
+  ]
+}

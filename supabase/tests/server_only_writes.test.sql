@@ -1,7 +1,7 @@
 -- Run with `supabase test db` after applying all migrations to a local database.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(10);
+select plan(14);
 
 select ok(not has_table_privilege('authenticated', 'public.games', 'INSERT'),
     'authenticated users cannot insert games directly');
@@ -26,6 +26,16 @@ select is((select count(*)::integer from pg_policies
 select is((select count(*)::integer from pg_class
     where oid in ('public.games'::regclass, 'public.space_explanations'::regclass)
     and relrowsecurity), 2, 'RLS remains enabled on both tables');
+
+select ok(not has_table_privilege('authenticated', 'public.space_explanation_requests', 'SELECT,INSERT,UPDATE,DELETE'),
+    'authenticated users cannot read or modify generation claims');
+select ok(not has_table_privilege('anon', 'public.space_explanation_requests', 'SELECT,INSERT,UPDATE,DELETE'),
+    'anonymous users cannot read or modify generation claims');
+select ok((select bool_and(has_table_privilege('service_role', 'public.space_explanation_requests', privilege))
+    from unnest(array['SELECT', 'INSERT', 'UPDATE']) as privilege),
+    'server can acquire claims and save recovery results');
+select ok((select relrowsecurity from pg_class where oid = 'public.space_explanation_requests'::regclass),
+    'RLS is enabled on generation claims');
 
 select * from finish();
 rollback;

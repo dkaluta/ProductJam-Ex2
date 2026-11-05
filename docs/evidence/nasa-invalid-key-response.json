@@ -1,0 +1,23 @@
+{
+  "experiment": "Exercise 5: deliberately invalid NASA API key",
+  "nasa_response": {
+    "status": 403,
+    "body": {
+      "error": {
+        "code": "API_KEY_INVALID",
+        "message": "An invalid api_key was supplied. Get one at https://api.nasa.gov:443"
+      }
+    }
+  },
+  "app_response": {
+    "path": "/api/nasa/pictures",
+    "status": 502,
+    "body": {
+      "error": {
+        "code": "nasa_unavailable",
+        "message": "Could not load NASA pictures."
+      }
+    }
+  },
+  "capture": "Actual NASA request and actual app request recorded in server output; Network-panel screenshot not captured because Chrome native accessibility timed out."
+}

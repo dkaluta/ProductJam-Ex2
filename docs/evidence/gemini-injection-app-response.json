@@ -1,0 +1,12 @@
+{
+  "experiment": "Exercise 6: appended prompt injection",
+  "date": "2025-05-14",
+  "path": "/api/nasa/explain",
+  "status": 502,
+  "body": {
+    "error": {
+      "code": "gemini_unavailable",
+      "message": "Could not generate the explanation. Choose another picture."
+    }
+  }
+}

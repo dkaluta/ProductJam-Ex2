@@ -26,7 +26,26 @@ export const SPACE_TAGS = [
   "other",
 ] as const;
 export const explanationSchema = z.object({
-  hebrew_title: z.string().min(1).max(300),
-  hebrew_summary: z.string().min(1).max(3000),
-  tags: z.array(z.enum(SPACE_TAGS)).min(1).max(5),
+  hebrew_title: z.string().trim().min(1).max(300).regex(/[א-ת]/),
+  hebrew_summary: z.string().trim().min(1).max(3000).regex(/[א-ת]/),
+  tags: z
+    .array(z.enum(SPACE_TAGS))
+    .min(1)
+    .max(5)
+    .refine(
+      (tags) => new Set(tags).size === tags.length,
+      "Tags must be unique",
+    ),
 });
+
+export const apodPictureSchema = z.object({
+  date: apodDateSchema,
+  title: z.string().max(1000),
+  explanation: z.string().max(30000),
+  url: z.url({ protocol: /^https?$/ }),
+  media_type: z.enum(["image", "video", "other"]),
+  copyright: z.string().max(1000).optional(),
+});
+export type SpaceExplanation = z.infer<typeof explanationSchema>;
+export type SpacePicture = z.infer<typeof apodPictureSchema> &
+  Partial<SpaceExplanation>;

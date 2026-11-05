@@ -1,0 +1,90 @@
+.card {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  min-width: 0;
+}
+.media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  background: var(--color-coverflow-bg);
+  color: var(--color-coverflow-text);
+  display: grid;
+  place-items: center;
+}
+.media img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.media p {
+  padding: var(--space-6);
+}
+.content {
+  padding: var(--space-6);
+  display: grid;
+  gap: var(--space-4);
+  overflow-wrap: anywhere;
+}
+.date,
+.credit {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+.title {
+  font-size: var(--text-xl);
+  margin: 0;
+}
+.source {
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+.source summary {
+  cursor: pointer;
+  color: var(--color-accent);
+}
+.source summary:hover {
+  text-decoration: underline;
+}
+.source summary:active {
+  color: var(--color-text);
+}
+.source summary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+.hebrew {
+  border-block-start: 1px solid var(--color-border);
+  padding-block-start: var(--space-4);
+  line-height: 1.8;
+}
+.hebrew h3 {
+  font-size: var(--text-lg);
+  margin: 0;
+}
+.hebrew p {
+  margin-block: var(--space-3);
+}
+.tags {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.tags li {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+}
+.error {
+  color: var(--color-danger);
+  margin: 0;
+}

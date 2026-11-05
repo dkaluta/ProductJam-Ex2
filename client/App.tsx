@@ -10,6 +10,7 @@ import { Layout } from "./pages/Layout";
 // One line per page. Each page is downloaded the first time someone visits
 // it, so adding pages never slows down the rest of the app.
 const HomePage = lazy(() => import("./pages/home/HomePage"));
+const SpacePage = lazy(() => import("./pages/space/SpacePage"));
 const GamesPage = lazy(() => import("./pages/games/GamesPage"));
 const SignInPage = lazy(() => import("./pages/signin/SignInPage"));
 const AuthCallbackPage = lazy(() => import("./pages/auth/AuthCallbackPage"));
@@ -79,6 +80,7 @@ export function App() {
 
                       {/* Everything in here needs a login. */}
                       <Route element={<RequireAuth />}>
+                        <Route path="/space" element={<SpacePage />} />
                         <Route path="/games" element={<GamesPage />} />
                         <Route path="/games/:id" element={<GamesPage />} />
                         <Route path="/events" element={<EventsPage />} />

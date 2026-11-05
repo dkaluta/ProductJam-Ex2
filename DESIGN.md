@@ -156,3 +156,15 @@ line. Never present invented demo games as account data.
 - Do reuse the current app tokens and shared primitives.
 - Don't copy 2009 Aqua appearance.
 - Don't allow completed games to be edited or abandoned.
+
+## Space pictures
+
+`docs/design.md` owns the Part 2 database/API contract. `/space` is a signed-in,
+image-led APOD gallery using the existing light surfaces, borders, Rubik
+headings, system body type, and shared Button/Spinner. Two columns become one at
+600px; each image has a reserved 4:3 dark stage with contain sizing so NASA
+artwork is never cropped. Cards show date, source title, credit, an expandable
+NASA description, and an explicit Explain in Hebrew action. Generated content
+uses Hebrew language and RTL direction within the English interface. Errors stay
+beside the action; saved explanations replace it. Components and API hooks live
+under `client/features/space/`; `SpacePage` only composes the page.

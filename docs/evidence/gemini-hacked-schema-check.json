@@ -1,0 +1,29 @@
+{
+  "kind": "Separate deterministic schema check, not a Gemini response",
+  "input": {
+    "hebrew_title": "בדיקה",
+    "hebrew_summary": "זהו מבחן. הטקסט נכתב בעברית.",
+    "tags": ["hacked"]
+  },
+  "accepted": false,
+  "issues": [
+    {
+      "code": "invalid_value",
+      "values": [
+        "galaxy",
+        "nebula",
+        "star",
+        "planet",
+        "moon",
+        "sun",
+        "earth",
+        "asteroid",
+        "comet",
+        "spaceflight",
+        "other"
+      ],
+      "path": ["tags", 0],
+      "message": "Invalid option: expected one of \"galaxy\"|\"nebula\"|\"star\"|\"planet\"|\"moon\"|\"sun\"|\"earth\"|\"asteroid\"|\"comet\"|\"spaceflight\"|\"other\""
+    }
+  ]
+}

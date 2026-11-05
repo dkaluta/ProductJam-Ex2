@@ -26,17 +26,29 @@ const picture = {
 };
 const explanation = {
   hebrew_title: "גלקסיה",
-  hebrew_summary: "זוהי גלקסיה.",
+  hebrew_summary: "זוהי גלקסיה. יש בה הרבה כוכבים.",
   tags: ["galaxy"],
 };
 let generated: unknown;
 let cached: unknown;
 let saved: unknown;
+let claim: { result?: unknown; error_code?: string } | null;
+let nasaEntries: unknown;
+let failSave: boolean;
+let failClaim: boolean;
+let failGemini: boolean;
+let geminiCalls: number;
 
 beforeEach(() => {
   generated = explanation;
   cached = null;
   saved = undefined;
+  claim = null;
+  nasaEntries = [picture];
+  failSave = false;
+  failClaim = false;
+  failGemini = false;
+  geminiCalls = 0;
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: Request | URL | string, init?: RequestInit) => {
@@ -44,26 +56,78 @@ beforeEach(() => {
         input instanceof Request ? input : new Request(input, init);
       const url = new URL(request.url);
       if (url.hostname === "api.nasa.gov") {
+        expect(request.redirect).toBe("manual");
         expect(url.pathname).toBe("/planetary/apod");
         expect(url.searchParams.get("api_key")).toBe(env.NASA_API_KEY);
         return Response.json(
-          url.searchParams.has("count") ? [picture] : picture,
+          url.searchParams.has("count") ? nasaEntries : picture,
         );
       }
       if (url.hostname === "generativelanguage.googleapis.com") {
+        expect(request.redirect).toBe("manual");
+        geminiCalls++;
+        if (failGemini) throw new Error("Timed out after possible billing");
         expect(request.headers.get("x-goog-api-key")).toBe(env.GEMINI_API_KEY);
+        const body = (await request.json()) as {
+          generationConfig: {
+            responseMimeType: string;
+            responseJsonSchema: {
+              properties: { tags: { items: { enum: string[] } } };
+            };
+          };
+          contents: { parts: { text: string }[] }[];
+        };
+        expect(body.generationConfig.responseMimeType).toBe("application/json");
+        expect(
+          body.generationConfig.responseJsonSchema.properties.tags.items.enum,
+        ).toContain("galaxy");
+        expect(JSON.parse(body.contents[0].parts[0].text)).toEqual({
+          title: picture.title,
+          explanation: picture.explanation,
+        });
         return Response.json({
           candidates: [
             { content: { parts: [{ text: JSON.stringify(generated) }] } },
           ],
         });
       }
+      if (url.pathname.endsWith("/space_explanation_requests")) {
+        if (request.method === "POST") {
+          if (failClaim)
+            return Response.json(
+              { code: "DB_ERROR", message: "Unavailable" },
+              { status: 500 },
+            );
+          if (claim)
+            return Response.json(
+              { code: "23505", message: "Duplicate" },
+              { status: 409 },
+            );
+          claim = {};
+          return new Response(null, { status: 201 });
+        }
+        if (request.method === "PATCH") {
+          claim = { ...claim, ...(await request.json()) };
+          return new Response(null, { status: 204 });
+        }
+        return Response.json(claim);
+      }
       if (request.method === "POST") {
+        if (failSave)
+          return Response.json(
+            { code: "DB_ERROR", message: "Unavailable" },
+            { status: 500 },
+          );
         saved = await request.json();
+        cached = saved;
         return new Response(null, { status: 201 });
       }
       return Response.json(
-        url.searchParams.get("date")?.startsWith("eq.") ? cached : [],
+        url.searchParams.get("date")?.startsWith("eq.")
+          ? cached
+          : cached
+            ? [cached]
+            : [],
       );
     }),
   );
@@ -142,6 +206,95 @@ describe("NASA proxy security", () => {
     const response = await app.request("/nasa/pictures", {}, env);
     expect(response.status).toBe(502);
     expect(await response.text()).not.toContain(env.NASA_API_KEY);
+  });
+  it("calls Gemini only once for simultaneous cache misses", async () => {
+    const responses = await Promise.all([
+      explain(picture.date),
+      explain(picture.date),
+    ]);
+    expect(responses.map((response) => response.status)).toContain(200);
+    expect(
+      responses.every((response) => [200, 409].includes(response.status)),
+    ).toBe(true);
+    expect(geminiCalls).toBe(1);
+    expect((await explain(picture.date)).status).toBe(200);
+    expect(geminiCalls).toBe(1);
+  });
+  it("recovers a failed final cache write without paying again", async () => {
+    failSave = true;
+    expect((await explain(picture.date)).status).toBe(500);
+    expect(claim?.result).toMatchObject(explanation);
+    failSave = false;
+    expect((await explain(picture.date)).status).toBe(200);
+    expect(saved).toMatchObject(explanation);
+    expect(geminiCalls).toBe(1);
+  });
+  it("does not repeat an uncertain paid request after a timeout", async () => {
+    failGemini = true;
+    expect((await explain(picture.date)).status).toBe(502);
+    failGemini = false;
+    expect((await explain(picture.date)).status).toBe(502);
+    expect(geminiCalls).toBe(1);
+    expect(saved).toBeUndefined();
+  });
+  it("does not pay when the database cannot acquire a claim", async () => {
+    failClaim = true;
+    expect((await explain(picture.date)).status).toBe(500);
+    expect(geminiCalls).toBe(0);
+  });
+  it("lets the user check an in-progress explanation without generating again", async () => {
+    claim = {};
+    const response = await explain(picture.date);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({
+      error: { code: "explanation_pending" },
+    });
+    expect(geminiCalls).toBe(0);
+  });
+  it("filters videos and duplicate dates and attaches cached explanations", async () => {
+    nasaEntries = [
+      picture,
+      picture,
+      { ...picture, date: "2024-03-16", media_type: "video" },
+    ];
+    cached = { date: picture.date, ...explanation };
+    const response = await app.request("/nasa/pictures", {}, env);
+    expect(await response.json()).toEqual([{ ...picture, ...explanation }]);
+    expect(geminiCalls).toBe(0);
+  });
+  it.each([
+    { ...explanation, hebrew_title: "English only" },
+    { ...explanation, hebrew_summary: " " },
+    { ...explanation, tags: [] },
+    { ...explanation, tags: ["galaxy", "galaxy"] },
+    {
+      ...explanation,
+      tags: ["galaxy", "nebula", "star", "planet", "sun", "earth"],
+    },
+  ])("rejects invalid output and never regenerates it", async (invalid) => {
+    generated = invalid;
+    expect((await explain(picture.date)).status).toBe(500);
+    expect((await explain(picture.date)).status).toBe(502);
+    expect(saved).toBeUndefined();
+    expect(geminiCalls).toBe(1);
+  });
+  it("rejects a mismatched NASA date", async () => {
+    vi.mocked(fetch).mockResolvedValueOnce(
+      Response.json({ ...picture, date: "2024-03-16" }),
+    );
+    await expect(
+      fetchApod(env.NASA_API_KEY, { date: picture.date }),
+    ).rejects.toThrow();
+  });
+  it.each([
+    new Response("NASA secret", { status: 429 }),
+    Response.json({ error: "bad" }),
+    new Response("not json"),
+  ])("returns a safe error for NASA failures", async (upstream) => {
+    vi.mocked(fetch).mockResolvedValueOnce(upstream);
+    const response = await app.request("/nasa/pictures", {}, env);
+    expect(response.status).toBe(502);
+    expect(await response.text()).not.toContain("NASA secret");
   });
   it("validates at the fetch boundary too", async () => {
     await expect(
