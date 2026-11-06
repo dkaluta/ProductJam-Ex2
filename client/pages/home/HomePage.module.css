@@ -1,5 +1,68 @@
-.logos {
-  display: flex;
+.intro {
+  max-width: 60ch;
+  color: var(--color-text-muted);
+  font-size: var(--text-lg);
+}
+
+.parts {
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--space-4);
-  margin-block: var(--space-4);
+  margin: 0;
+  margin-block-start: var(--space-6);
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .parts {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.parts > li {
+  display: flex;
+}
+
+.card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.number {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin-block: var(--space-1) 0;
+  font-size: var(--text-xl);
+}
+
+.description {
+  margin-block: var(--space-2) var(--space-4);
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: 0;
+  margin-block-start: auto;
+  font-size: var(--text-sm);
+}
+
+.note {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.signin {
+  margin-block-start: var(--space-6);
 }

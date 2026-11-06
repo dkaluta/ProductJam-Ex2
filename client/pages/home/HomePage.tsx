@@ -1,77 +1,74 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router";
-import { api } from "../../lib/api";
+import { Card } from "../../components";
 import { useAuth } from "../../lib/auth";
 import styles from "./HomePage.module.css";
 
-type Me = { id: string; email: string };
+/** The three parts of the exercise, each with the page it lives on. */
+const PARTS = [
+  {
+    number: 1,
+    title: "Tic-tac-toe",
+    path: "/games",
+    description:
+      "The four variant: a 4×4 board where four in a row wins. Two players share the screen, and the server replays every saved game to check it.",
+    needsLogin: true,
+  },
+  {
+    number: 2,
+    title: "Space pictures",
+    path: "/space",
+    description:
+      "Random pictures from NASA's Astronomy Picture of the Day, each one explained in Hebrew by Gemini, with every explanation saved.",
+    needsLogin: true,
+  },
+  {
+    number: 3,
+    title: "Design to code",
+    path: "/responsive-demo",
+    description:
+      "A designer's mobile screen, built from Figma and made responsive together, up to a wide desktop.",
+    needsLogin: false,
+  },
+];
 
-/**
- * The home page. Replace all of this with your own app.
- *
- * Once you are logged in, it shows the two halves of the system talking to
- * each other: the browser knows who you are from Supabase, and /api/me
- * proves the SERVER agrees - it checked your token before answering.
- */
+/** The home page: a short introduction and a link to each part. */
 export default function HomePage() {
   const { user } = useAuth();
 
-  const meQuery = useQuery({
-    queryKey: ["me"],
-    queryFn: () => api<Me>("/api/me"),
-    // Only ask once we know somebody is logged in.
-    enabled: Boolean(user),
-  });
-
   return (
     <main>
-      <h2>Welcome to the Product Jam Starter Kit</h2>
-      <p>
-        Feel free to look around, edit the source code and navigate to the
-        demos. This page is client/pages/home/HomePage.tsx.
+      <h1>Product Jam · Exercise 2</h1>
+      <p className={styles.intro}>
+        Three parts of one app: a game the server checks, pictures from NASA
+        explained by an LLM, and a design built together with a designer.
       </p>
 
-      <div className={styles.logos}>
-        <img src="/huji.svg" alt="HUJI Logo" width="80" height="80" />
-        <img src="/bezalel.svg" alt="Bezalel Logo" width="80" height="80" />
-      </div>
+      <ol className={styles.parts}>
+        {PARTS.map((part) => (
+          <li key={part.path}>
+            <Card className={styles.card}>
+              <p className={styles.number}>Part {part.number}</p>
+              <h2 className={styles.title}>{part.title}</h2>
+              <p className={styles.description}>{part.description}</p>
+              <p className={styles.footer}>
+                {part.needsLogin && !user ? (
+                  <span className={styles.note}>Needs a login</span>
+                ) : (
+                  <span />
+                )}
+                <Link to={part.path}>Open part {part.number} →</Link>
+              </p>
+            </Card>
+          </li>
+        ))}
+      </ol>
 
-      {user ? (
-        <>
-          <p>
-            The server knows you as:{" "}
-            <strong>
-              {meQuery.isPending
-                ? "Checking..."
-                : meQuery.isError
-                  ? "Error"
-                  : meQuery.data.email}
-            </strong>
-          </p>
-          <p>
-            <Link to="/events">My events</Link>
-          </p>
-        </>
+      {!user ? (
+        <p className={styles.signin}>
+          <Link to="/signin">Log in</Link> to play and to see the space
+          pictures.
+        </p>
       ) : null}
-
-      <h2>Lorem Ipsum</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec faucibus
-        sit amet nunc nec vehicula. Fusce ornare nec nulla non imperdiet. Fusce
-        vel sodales justo. Sed efficitur arcu lorem, at iaculis odio ultricies
-        et. Duis rutrum urna nec elit bibendum, sed hendrerit nulla posuere.
-        Vestibulum vestibulum, ante non tincidunt posuere, dui arcu lacinia
-        nisl, nec rhoncus massa arcu ac ipsum. Nam congue interdum tortor, eu
-        dignissim massa scelerisque vitae.
-      </p>
-      <ul>
-        <li>
-          Aliquam maximus tellus sed lacus venenatis, ac cursus eros mollis.
-        </li>
-        <li>In id ante sed sem pharetra molestie et vitae arcu.</li>
-        <li>Cras pharetra turpis at pretium elementum.</li>
-        <li>Donec ultrices felis vel lectus auctor iaculis.</li>
-      </ul>
     </main>
   );
 }
