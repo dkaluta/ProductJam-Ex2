@@ -40,8 +40,9 @@ npm-debug.log*
 # Test output
 coverage/
 
-# Paid fonts - the full fonts (fonts-source/) are not in the repo, only
-# encrypted copies (fonts-encrypted/). client/public/fonts/ holds the cut-down
-# copies the site serves, which scripts/fonts.mjs makes.
+# Paid fonts - the full fonts are not in the repo. fonts-encrypted/ and
+# client/public/fonts/*.enc are locked copies (see scripts/fonts.mjs); any
+# plain font file in client/public/fonts/ stays out.
 fonts-source/
-client/public/fonts/
+client/public/fonts/*
+!client/public/fonts/*.enc

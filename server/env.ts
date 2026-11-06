@@ -24,6 +24,9 @@ export type Bindings = {
   NASA_API_KEY: string;
   /** The static files (the built client/), from "assets" in wrangler.jsonc. */
   ASSETS: Fetcher;
+  /** Unlocks the paid fonts (see routes/fonts.ts). Optional so the rest of
+   *  the server works without it; the fonts then answer 404. */
+  FONTS_KEY?: string;
 };
 
 /** Things our own middleware adds to the request, for handlers to read. */

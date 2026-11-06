@@ -2,9 +2,9 @@
   wizzin - from the Figma frame "חשבונית אפיון" (440px wide, phone only for now).
 
   Fonts: the logo font, Manufacturing Consent, comes from Google Fonts.
-  Fedra Serif and Narkiss Block are paid fonts. scripts/fonts.mjs makes the
-  cut-down WOFF2 copies in client/public/fonts/ that this page loads. If they
-  are missing, Frank Ruhl Libre and Rubik stand in.
+  Fedra Serif and Narkiss Block are paid fonts, cut down to this page's
+  characters and unlocked by the Worker as they load (scripts/fonts.mjs,
+  server/routes/fonts.ts). If they fail, Frank Ruhl Libre and Rubik stand in.
 */
 @import url("https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Frank+Ruhl+Libre:wght@500;700&display=swap");
 

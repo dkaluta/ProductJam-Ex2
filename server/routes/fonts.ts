@@ -2,21 +2,53 @@ import { Hono } from "hono";
 import type { AppEnv } from "../env";
 
 /**
- * The paid fonts in client/public/fonts/ (made by scripts/fonts.mjs).
+ * The paid fonts.
  *
- * wrangler.jsonc sends /fonts/* here before the static files, and this hands
- * a font over only when a page of this site asked for it. Opening the URL
- * directly, or using the font from another site, gets a 404.
+ * client/public/fonts/ holds only locked (encrypted) copies, cut down to the
+ * characters the site uses (scripts/fonts.mjs makes them). wrangler.jsonc
+ * sends every /fonts/* request here first. When a page of this site asks for
+ * /fonts/<name>.woff2, this reads <name>.woff2.enc and unlocks it with the
+ * FONTS_KEY secret. Anything else - opening the URL directly, another site
+ * using the font, asking for the .enc file - gets a 404.
  *
  * This is a hurdle, not a lock: the browser still downloads the font to
- * draw the text, and anyone can save it from there. The fonts are also cut
- * down to the characters the site uses, so what they get is incomplete.
+ * draw the text, and anyone can save it from there. What they get is the
+ * cut-down font, not the whole one.
  */
-export const fonts = new Hono<AppEnv>().get("/*", (c) => {
-  if (!isFontLoadFromThisSite(c.req.raw)) {
+const FONT_URL = /^\/fonts\/([a-z0-9-]+)\.woff2$/;
+
+export const fonts = new Hono<AppEnv>().get("/*", async (c) => {
+  const name = FONT_URL.exec(new URL(c.req.url).pathname)?.[1];
+  if (!name || !isFontLoadFromThisSite(c.req.raw)) {
     return c.text("Not found", 404);
   }
-  return c.env.ASSETS.fetch(c.req.raw);
+  if (!c.env.FONTS_KEY) {
+    console.error("fonts: FONTS_KEY is not set on this Worker");
+    return c.text("Not found", 404);
+  }
+
+  const locked = await c.env.ASSETS.fetch(
+    new URL(`/fonts/${name}.woff2.enc`, c.req.url),
+  );
+  if (!locked.ok) return c.text("Not found", 404);
+
+  let font: ArrayBuffer;
+  try {
+    font = await unlockFont(await locked.arrayBuffer(), c.env.FONTS_KEY);
+  } catch {
+    // A missing file (the asset fallback answers with the HTML page) or the
+    // wrong key both end up here.
+    console.error(`fonts: could not unlock ${name}.woff2.enc`);
+    return c.text("Not found", 404);
+  }
+
+  return new Response(font, {
+    headers: {
+      "content-type": "font/woff2",
+      // "private": the browser may keep it, shared caches may not.
+      "cache-control": "private, max-age=86400",
+    },
+  });
 });
 
 /**
@@ -42,4 +74,36 @@ export function isFontLoadFromThisSite(request: Request): boolean {
   } catch {
     return false;
   }
+}
+
+const IV_BYTES = 12;
+const TAG_BYTES = 16;
+
+/**
+ * Unlocks a file locked by scripts/fonts.mjs: AES-256-GCM, laid out as a
+ * 12-byte IV, the 16-byte tag, then the data. Throws on a wrong key or a
+ * damaged file.
+ */
+export async function unlockFont(
+  locked: ArrayBuffer,
+  keyBase64: string,
+): Promise<ArrayBuffer> {
+  const bytes = new Uint8Array(locked);
+  const iv = bytes.subarray(0, IV_BYTES);
+  const tag = bytes.subarray(IV_BYTES, IV_BYTES + TAG_BYTES);
+  const data = bytes.subarray(IV_BYTES + TAG_BYTES);
+
+  // Web Crypto wants the tag at the end, after the data.
+  const dataThenTag = new Uint8Array(data.length + TAG_BYTES);
+  dataThenTag.set(data);
+  dataThenTag.set(tag, data.length);
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    Uint8Array.from(atob(keyBase64.trim()), (char) => char.charCodeAt(0)),
+    "AES-GCM",
+    false,
+    ["decrypt"],
+  );
+  return crypto.subtle.decrypt({ name: "AES-GCM", iv }, key, dataThenTag);
 }

@@ -1,30 +1,28 @@
 /**
- * The paid fonts (Fedra Serif, Narkiss Block).
+ * The paid fonts (Fedra Serif, Narkiss Block). One key, FONTS_KEY, locks
+ * them: it is in your .env, and a runtime secret on the Cloudflare Worker.
  *
  *   fonts-source/        The full fonts. Not in git, never served.
- *   fonts-encrypted/     Encrypted copies of fonts-source/, in git. FONTS_KEY
- *                        unlocks them - from .env locally, and a Cloudflare
- *                        build secret (Settings → Build → Variables and
- *                        secrets) on deploys.
- *   client/public/fonts/ What the site serves: WOFF2 files cut down to the
- *                        characters the pages that use these fonts contain.
- *                        Not in git; this script makes them.
+ *   fonts-encrypted/     Encrypted copies of the full fonts, in git, so any
+ *                        computer with the key can rebuild everything.
+ *   client/public/fonts/ Encrypted WOFF2 files cut down to the characters the
+ *                        pages using these fonts contain - in git, and
+ *                        deployed as they are. The Worker unlocks one each
+ *                        time a page asks for it (server/routes/fonts.ts), so
+ *                        Cloudflare's build never needs the key.
  *
- * So a visitor who saves the font files gets only those characters, not the
- * whole font. The Worker also refuses /fonts/* requests that don't come from
- * the site's own pages (see server/routes/fonts.ts).
+ * So a visitor can only ever get the cut-down font, and only by loading the
+ * page: the Worker refuses /fonts/* requests from anywhere else.
  *
- *   node scripts/fonts.mjs           Before `npm run dev` and `npm run build`
- *                                    (both run it): unlocks any missing full
- *                                    font, then makes the cut-down WOFF2s.
+ *   node scripts/fonts.mjs           Run by `npm run dev` and `npm run build`.
+ *                                    With the key (or the full fonts), it
+ *                                    remakes the cut-down fonts when the
+ *                                    page's text has changed - commit
+ *                                    client/public/fonts/ afterwards. Without
+ *                                    them (as on Cloudflare) it does nothing.
  *   node scripts/fonts.mjs encrypt   After adding or changing a font in
  *                                    fonts-source/ (`npm run fonts:encrypt`).
  *                                    Makes a key first if .env has none.
- *                                    Commit fonts-encrypted/ afterwards.
- *
- * Without the key, missing fonts only print a warning on your computer (the
- * page falls back to other fonts), but stop the build on Cloudflare, so a
- * deploy never goes out without its fonts by accident.
  */
 import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
@@ -34,6 +32,7 @@ import {
   readFile,
   readdir,
   rename,
+  rm,
   writeFile,
 } from "node:fs/promises";
 import subsetFont from "subset-font";
@@ -47,9 +46,9 @@ const ENV_FILE = new URL("../.env", import.meta.url);
 const TEXT_FROM = [
   new URL("../client/pages/responsive-demo/", import.meta.url),
 ];
-const IN_CI = Boolean(process.env.CI || process.env.WORKERS_CI);
 
 // AES-256-GCM. Each encrypted file is: 12-byte IV, 16-byte tag, then data.
+// server/routes/fonts.ts reads the same layout.
 const IV_BYTES = 12;
 const TAG_BYTES = 16;
 
@@ -65,7 +64,34 @@ function readKey() {
   return key;
 }
 
+function lock(key, plain) {
+  const iv = randomBytes(IV_BYTES);
+  const cipher = createCipheriv("aes-256-gcm", key, iv);
+  const data = Buffer.concat([cipher.update(plain), cipher.final()]);
+  return Buffer.concat([iv, cipher.getAuthTag(), data]);
+}
+
+function unlock(key, blob, what) {
+  const decipher = createDecipheriv(
+    "aes-256-gcm",
+    key,
+    blob.subarray(0, IV_BYTES),
+  );
+  decipher.setAuthTag(blob.subarray(IV_BYTES, IV_BYTES + TAG_BYTES));
+  try {
+    return Buffer.concat([
+      decipher.update(blob.subarray(IV_BYTES + TAG_BYTES)),
+      decipher.final(),
+    ]);
+  } catch {
+    throw new Error(
+      `fonts: FONTS_KEY does not unlock ${what} - it is the wrong key, or the file was locked with another one.`,
+    );
+  }
+}
+
 const sourceFile = (name) => new URL(`${name}.otf`, SOURCE);
+const servedFile = (name) => new URL(`${name}.woff2.enc`, SERVED);
 
 async function encrypt() {
   let key = readKey();
@@ -73,76 +99,30 @@ async function encrypt() {
     key = randomBytes(32);
     await appendFile(
       ENV_FILE,
-      `\n# Unlocks the fonts in fonts-encrypted/ (see scripts/fonts.mjs)\nFONTS_KEY=${key.toString("base64")}\n`,
+      `\n# Unlocks the fonts (see scripts/fonts.mjs). Also a runtime secret on the Worker.\nFONTS_KEY=${key.toString("base64")}\n`,
     );
     console.log("fonts: made a new FONTS_KEY and added it to .env");
   }
-
   await mkdir(ENCRYPTED, { recursive: true });
   for (const name of FONTS) {
-    const plain = await readFile(sourceFile(name));
-    const iv = randomBytes(IV_BYTES);
-    const cipher = createCipheriv("aes-256-gcm", key, iv);
-    const data = Buffer.concat([cipher.update(plain), cipher.final()]);
     await writeFile(
       new URL(`${name}.otf.enc`, ENCRYPTED),
-      Buffer.concat([iv, cipher.getAuthTag(), data]),
+      lock(key, await readFile(sourceFile(name))),
     );
     console.log(`fonts: encrypted ${name}.otf`);
   }
+  // A new key means the served fonts need locking again too.
+  await makeServedFonts(key, { force: true });
 }
 
-/** Makes sure fonts-source/ has every font. Returns the ones it has. */
-async function unlockSources() {
-  await mkdir(SOURCE, { recursive: true });
-
-  // Earlier versions kept the full fonts in client/public/fonts/.
-  for (const name of FONTS) {
-    const old = new URL(`${name}.otf`, SERVED);
-    if (!existsSync(sourceFile(name)) && existsSync(old)) {
-      await rename(old, sourceFile(name));
-      console.log(`fonts: moved ${name}.otf to fonts-source/`);
-    }
-  }
-
-  const missing = FONTS.filter((name) => !existsSync(sourceFile(name)));
-  if (missing.length === 0) return FONTS;
-
-  const key = readKey();
-  if (!key) {
-    const message = `fonts: ${missing.join(" and ")} missing, and FONTS_KEY is not set.`;
-    if (IN_CI) {
-      throw new Error(
-        `${message}\nAdd FONTS_KEY (from your .env) in Cloudflare: Settings → Build → Variables and secrets.`,
-      );
-    }
-    console.warn(`${message} The page will use fallback fonts.`);
-    return FONTS.filter((name) => !missing.includes(name));
-  }
-
-  for (const name of missing) {
-    const blob = await readFile(new URL(`${name}.otf.enc`, ENCRYPTED));
-    const decipher = createDecipheriv(
-      "aes-256-gcm",
-      key,
-      blob.subarray(0, IV_BYTES),
-    );
-    decipher.setAuthTag(blob.subarray(IV_BYTES, IV_BYTES + TAG_BYTES));
-    let plain;
-    try {
-      plain = Buffer.concat([
-        decipher.update(blob.subarray(IV_BYTES + TAG_BYTES)),
-        decipher.final(),
-      ]);
-    } catch {
-      throw new Error(
-        `fonts: FONTS_KEY does not unlock ${name}.otf.enc - it is the wrong key, or the file was encrypted with another one.`,
-      );
-    }
-    await writeFile(sourceFile(name), plain);
-    console.log(`fonts: decrypted ${name}.otf`);
-  }
-  return FONTS;
+/** The full font, from fonts-source/ or unlocked from fonts-encrypted/. */
+async function fullFont(key, name) {
+  if (existsSync(sourceFile(name))) return readFile(sourceFile(name));
+  return unlock(
+    key,
+    await readFile(new URL(`${name}.otf.enc`, ENCRYPTED)),
+    `${name}.otf.enc`,
+  );
 }
 
 /** Every character in the source files of the pages that use the fonts. */
@@ -166,22 +146,60 @@ async function charactersUsed() {
     .join("");
 }
 
-async function makeServedFonts(names) {
-  if (names.length === 0) return;
+async function makeServedFonts(key, { force = false } = {}) {
   await mkdir(SERVED, { recursive: true });
   const characters = await charactersUsed();
-  for (const name of names) {
-    const full = await readFile(sourceFile(name));
-    const woff2 = await subsetFont(full, characters, { targetFormat: "woff2" });
-    await writeFile(new URL(`${name}.woff2`, SERVED), woff2);
+  for (const name of FONTS) {
+    const woff2 = await subsetFont(await fullFont(key, name), characters, {
+      targetFormat: "woff2",
+    });
+    // Locking uses a random IV, so the file would change on every run. Only
+    // write it when the font inside is actually different.
+    if (!force && existsSync(servedFile(name))) {
+      const current = unlock(
+        key,
+        await readFile(servedFile(name)),
+        `${name}.woff2.enc`,
+      );
+      if (current.equals(woff2)) continue;
+    }
+    await writeFile(servedFile(name), lock(key, woff2));
     console.log(
-      `fonts: ${name}.woff2 - ${characters.length} characters, ${(woff2.length / 1024).toFixed(1)} KB (full font ${(full.length / 1024).toFixed(1)} KB)`,
+      `fonts: updated ${name}.woff2.enc - ${characters.length} characters, ${(woff2.length / 1024).toFixed(1)} KB. Commit client/public/fonts/.`,
     );
   }
+}
+
+async function build() {
+  // Earlier versions kept plain fonts in client/public/fonts/. Full fonts go
+  // to fonts-source/; plain cut-down ones are no longer needed.
+  for (const name of FONTS) {
+    const oldFull = new URL(`${name}.otf`, SERVED);
+    if (existsSync(oldFull)) {
+      if (!existsSync(sourceFile(name))) {
+        await mkdir(SOURCE, { recursive: true });
+        await rename(oldFull, sourceFile(name));
+        console.log(`fonts: moved ${name}.otf to fonts-source/`);
+      } else {
+        await rm(oldFull);
+      }
+    }
+    await rm(new URL(`${name}.woff2`, SERVED), { force: true });
+  }
+
+  const key = readKey();
+  if (!key) {
+    // Cloudflare's build lands here: it deploys the committed files as they are.
+    console.log(
+      "fonts: no FONTS_KEY here, so using the committed fonts in client/public/fonts/ as they are.",
+    );
+    return;
+  }
+  await makeServedFonts(key);
 }
 
 if (process.argv[2] === "encrypt") {
   await encrypt();
 } else {
-  await makeServedFonts(await unlockSources());
+  await build();
 }
