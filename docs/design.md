@@ -185,63 +185,13 @@ the server's service role can read, insert, and update claims. The existing
 
 #### What changed
 
-- Added the signed-in `/space` gallery and navigation link. It requests up to 20
-  random APOD entries through our server in batches of four, with Load more
-  capped at 20 visible pictures. It skips videos and unavailable records, and
-  offers New pictures, NASA descriptions/source links, image credits, and Hebrew
-  explanations.
-- Component ownership: `SpacePage` composes `PictureGallery`, `PictureCard`, and
-  `HebrewExplanation`; `client/features/space/hooks.ts` owns API access and
-  browser cache updates. Shared Button and Spinner primitives and existing
-  visual tokens are reused. Hebrew content has explicit `lang="he"` and RTL
-  direction; the surrounding interface remains English.
-- The original `space_explanations` schema is preserved. The additive migration
-  `20261104120000_space_explanation_requests.sql` introduces server-only claims
-  so simultaneous requests across users and Workers cannot pay twice.
-- The default is `gemini-3.8-flash`, a current stable Flash model, with an
-  optional server-only `GEMINI_MODEL` override. Gemini is called via REST
-  `fetch`, without an SDK. NASA/Gemini keys and the Supabase secret stay on the
-  server.
-- The prompt asks for a Hebrew title, exactly 2–3 simple Hebrew sentences for a
-  10-year-old, and 1–5 allowed tags. Structured JSON output is still checked
-  with `shared/schemas/nasa.ts`: nonblank Hebrew text, length limits, and 1–5
-  unique allowed tags. Sentence quality and age suitability remain prompt
-  requirements rather than a claim of semantic validation.
-- Allowed tags: `galaxy`, `nebula`, `star`, `planet`, `moon`, `sun`, `earth`,
-  `asteroid`, `comet`, `spaceflight`, `other`.
-- NASA API requests have a 45-second deadline (including single-date lookups),
-  and Gemini requests 20 seconds. Both use Workers-compatible manual redirect
-  handling and reject non-success API responses, including redirects. Calls
-  return safe application errors; upstream responses and secrets are never
-  forwarded as errors. NASA's returned date must match the requested date. The
-  browser sends only `{ date }` for explanations; source title and description
-  are fetched by the server.
-- Fixed actual picture loading after NASA's site migration. Some API responses
-  incorrectly return the NASA logo, generic title, and introductory text. The
-  server detects those records and retrieves the date's APOD page, extracting
-  its astronomy image, title, and explanation. This recovery follows at most
-  three redirects, only between `apod.nasa.gov` and `science.nasa.gov`, without
-  the API key. Generic landing pages are rejected. Modern API records with an
-  article `url` use `hdurl` for the actual image. One failed recovery does not
-  discard healthy pictures in the same batch. The fixed 4:3 image area contains
-  the complete photo without intrinsic image dimensions stretching the card.
-  Recovery now prefers the article's actual image (including animated GIFs) over
-  social-preview metadata. NASA's `news-thumbnail.png` meatball is rejected
-  alongside named logos, using the shared `shared/space-images.ts` detector in
-  the server and browser. Vimeo/YouTube embeds and native videos are classified
-  as video and skipped instead of displaying their default social-preview logo.
-  The gallery cache key was updated to discard previously loaded placeholders.
-- Claims never expire automatically. A provider timeout, invalid response, or
-  Worker interruption may follow a billed call, so the date stays blocked rather
-  than silently generating again. An operator must investigate stuck/failed
-  claims before any manual reset. If a validated recovery result was stored but
-  the final cache insert failed, Check/Try again saves that result without a new
-  paid call. If even recovery storage failed, the result may be lost; the claim
-  still prevents another charge.
-- Loading, empty selections, image failures, provider/database errors, and
-  pending explanations are visible with recovery actions. Browser mutations
-  never retry automatically; saved Hebrew results appear immediately in cards.
+| Area            | Change                                                                         |
+| --------------- | ------------------------------------------------------------------------------ |
+| Gallery         | `/space` loads four NASA pictures at a time, up to 20.                         |
+| NASA images     | The server recovers missing images from APOD pages and skips logos and videos. |
+| Explanations    | The server fetches the source text and checks Gemini’s Hebrew output with Zod. |
+| Cache           | A database claim prevents repeat Gemini calls for the same date.               |
+| Errors and keys | API keys stay on the server, which returns its own errors if a provider fails. |
 
-Setup: apply the new Supabase migration before using the feature, and configure
-server-only `NASA_API_KEY` and `GEMINI_API_KEY`. `GEMINI_MODEL` is optional.
-Model reference: https://aistudio.google.com/docs/models/gemini-3.8-flash.
+Apply the migration for `space_explanation_requests` and set `NASA_API_KEY` and
+`GEMINI_API_KEY` on the server. `GEMINI_MODEL` is optional.
