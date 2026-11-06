@@ -4,6 +4,7 @@ import type { AppEnv } from "./env";
 import { fail } from "./lib/errors";
 import { requireAuth } from "./middleware/auth";
 import { events } from "./routes/events";
+import { fonts } from "./routes/fonts";
 import { health } from "./routes/health";
 import { me } from "./routes/me";
 import { uploads } from "./routes/uploads";
@@ -13,8 +14,9 @@ import { nasa } from "./routes/nasa";
 /**
  * This is the server. It runs on Cloudflare Workers, NOT in the browser.
  *
- * Everything it handles lives under /api/*. Every other URL is served by the
- * browser app in client/ (see wrangler.jsonc).
+ * Everything it handles lives under /api/*, plus /fonts/* (see
+ * routes/fonts.ts). Every other URL is served by the browser app in client/
+ * (see wrangler.jsonc).
  */
 const app = new Hono<AppEnv>();
 
@@ -24,6 +26,7 @@ const app = new Hono<AppEnv>();
 // in the order you register them, and that order is what makes these public.
 // ---------------------------------------------------------------------------
 app.route("/api/health", health);
+app.route("/fonts", fonts);
 
 // ---------------------------------------------------------------------------
 // Everything registered BELOW this line requires a logged-in user.

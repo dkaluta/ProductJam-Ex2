@@ -6,7 +6,7 @@
     "node": ">=24"
   },
   "scripts": {
-    "dev": "vite dev",
+    "dev": "node --env-file-if-exists=.env scripts/fonts.mjs && vite dev",
     "build": "node --env-file-if-exists=.env scripts/fonts.mjs && vite build",
     "fonts:encrypt": "node --env-file-if-exists=.env scripts/fonts.mjs encrypt",
     "preview": "npm run build && vite preview",
@@ -47,6 +47,7 @@
     "eslint-plugin-react-refresh": "0.5.7",
     "globals": "17.12.0",
     "prettier": "3.9.8",
+    "subset-font": "2.9.0",
     "typescript": "5.9.3",
     "typescript-eslint": "8.70.0",
     "vite": "8.3.0",

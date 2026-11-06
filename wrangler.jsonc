@@ -27,8 +27,12 @@
     "not_found_handling": "single-page-application",
 
     // Anything matching these patterns goes to the Worker FIRST, instead of being
-    // treated as a missing static file.
-    "run_worker_first": ["/api/*"],
+    // treated as a missing static file. /fonts/* is checked by
+    // server/routes/fonts.ts before the font is handed over.
+    "run_worker_first": ["/api/*", "/fonts/*"],
+
+    // Lets the Worker serve a static file itself: c.env.ASSETS.fetch(...).
+    "binding": "ASSETS",
   },
 
   "observability": { "enabled": true },

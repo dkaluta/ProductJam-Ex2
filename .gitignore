@@ -40,7 +40,8 @@ npm-debug.log*
 # Test output
 coverage/
 
-# Paid fonts - licensed, so only encrypted copies are in the repo, in
-# fonts-encrypted/. `npm run build` unlocks them with FONTS_KEY (see
-# scripts/fonts.mjs).
+# Paid fonts - the full fonts (fonts-source/) are not in the repo, only
+# encrypted copies (fonts-encrypted/). client/public/fonts/ holds the cut-down
+# copies the site serves, which scripts/fonts.mjs makes.
+fonts-source/
 client/public/fonts/

@@ -22,6 +22,8 @@ export type Bindings = {
   GEMINI_MODEL?: string;
   /** The API key for space photograph */
   NASA_API_KEY: string;
+  /** The static files (the built client/), from "assets" in wrangler.jsonc. */
+  ASSETS: Fetcher;
 };
 
 /** Things our own middleware adds to the request, for handlers to read. */
