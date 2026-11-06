@@ -1,0 +1,21 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--wizzin-font-body);
+  font-size: 19px;
+  line-height: 1.3;
+  color: var(--wizzin-text);
+}
+
+.icon {
+  flex-shrink: 0;
+}

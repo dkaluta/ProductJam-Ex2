@@ -1,0 +1,26 @@
+.topic {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--wizzin-font-body);
+  line-height: 1.3;
+}
+
+.label {
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: inherit;
+  color: var(--wizzin-purple);
+}
+
+.text {
+  font-size: 19px;
+  color: var(--wizzin-text);
+}

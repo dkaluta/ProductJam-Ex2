@@ -1,0 +1,301 @@
+/*
+  wizzin - from the Figma frame "חשבונית אפיון" (440px wide, phone only for now).
+
+  Fonts: the logo font, Manufacturing Consent, comes from Google Fonts.
+  Fedra Serif and Narkiss Block are paid fonts in client/public/fonts/, which
+  is not in git - scripts/fetch-fonts.mjs fetches them for a deploy. If they
+  are missing, Frank Ruhl Libre and Rubik stand in.
+*/
+@import url("https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Frank+Ruhl+Libre:wght@500;700&display=swap");
+
+@font-face {
+  font-family: "Fedra Serif H+L";
+  src: url("/fonts/FedraSerifH+L-Demi.otf") format("opentype");
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Narkiss Block";
+  src: url("/fonts/NarkissBlock-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+.page {
+  /* Colours from the Figma file's styles. */
+  --wizzin-green: #bceb44; /* ירוק */
+  --wizzin-red: #ff3b27; /* אדום */
+  --wizzin-purple: #dc9fe9; /* סגול */
+  --wizzin-blue: #648cd2; /* כחול */
+  --wizzin-pink: #ebdede;
+  --wizzin-text: #f4efe6; /* v2/טקסט */
+  --wizzin-card: rgb(19 19 19 / 0.96); /* v2/דף */
+  --wizzin-card-border: #282828;
+
+  --wizzin-font-logo: "Manufacturing Consent", serif;
+  --wizzin-font-titles: "Fedra Serif H+L", "Fedra Serif A", "Frank Ruhl Libre", serif;
+  --wizzin-font-body: "Narkiss Block", "Rubik", sans-serif;
+
+  min-height: 100vh;
+  padding: 482px 27px 86px;
+  /* The tapestry, darkened from just under the top picture downwards. */
+  background:
+    linear-gradient(to bottom, transparent 295px, rgb(0 0 0 / 0.77) 561px),
+    url("./assets/tapestry.png") left top / 1161px 774px repeat,
+    var(--wizzin-pink);
+  color: var(--wizzin-text);
+  font-family: var(--wizzin-font-body);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 386px;
+  margin-inline: auto;
+  /* global.css pads every <main>; this page sets its own spacing. */
+  padding: 0;
+}
+
+/* === HEADER ============================================================== */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 8px;
+  padding-inline: 14.5px;
+}
+
+.appName {
+  align-self: stretch;
+  font-family: var(--wizzin-font-logo);
+  font-size: 122.858px;
+  font-weight: 400;
+  line-height: 0.95;
+  color: var(--wizzin-pink);
+  text-align: start;
+}
+
+.description {
+  font-family: var(--wizzin-font-titles);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--wizzin-pink);
+}
+
+.colors {
+  display: flex;
+}
+
+.colors span {
+  width: 33.5px;
+  height: 35px;
+}
+
+.blue {
+  background-color: var(--wizzin-blue);
+}
+
+.green {
+  background-color: var(--wizzin-green);
+}
+
+.red {
+  background-color: var(--wizzin-red);
+}
+
+.purple {
+  background-color: var(--wizzin-purple);
+}
+
+/* === SHARED TEXT ========================================================= */
+
+.bodyText {
+  font-family: var(--wizzin-font-body);
+  font-size: 19px;
+  line-height: 1.3;
+  color: var(--wizzin-pink);
+}
+
+/* === 01 · רקע ============================================================ */
+
+.backgroundBlock {
+  gap: 20px;
+}
+
+.problem {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* === 02 · מה המוצר ======================================================= */
+
+.descriptionBlock {
+  gap: 25px;
+}
+
+/* === 03 · קהל היעד ======================================================= */
+
+.audienceBlock {
+  gap: 26px;
+}
+
+.portraits {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.portrait {
+  width: 107px;
+  height: 107px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.portraitBird {
+  object-position: 50% 45%;
+}
+
+.portraitScarf {
+  object-position: 50% 30%;
+}
+
+.portraitOldMan {
+  object-position: 50% 8%;
+}
+
+.needs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-inline-end: 21px;
+}
+
+/* === 04 · שפה גרפית ====================================================== */
+
+.designBlock {
+  gap: 28px;
+}
+
+.tapestry {
+  position: relative;
+  height: 148px;
+  border: 1px solid rgb(145 145 145 / 0.79);
+  overflow: hidden;
+}
+
+.tapestry img {
+  position: absolute;
+  /* Physical left, as in Figma, so the crop does not flip in RTL. */
+  left: 0;
+  top: -221.1%;
+  width: 200%;
+  max-width: none;
+  height: 356.61%;
+}
+
+.creatures {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 190px;
+}
+
+.lion,
+.bird {
+  position: relative;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.lion {
+  width: 166px;
+  height: 127px;
+}
+
+.lion img {
+  position: absolute;
+  top: 0.54%;
+  left: 0.33%;
+  width: 99.11%;
+  max-width: none;
+  height: 98.77%;
+}
+
+/* The bird is the left part of its picture, turned to face right. */
+.bird {
+  width: 146px;
+  height: 133px;
+  transform: scaleX(-1);
+}
+
+.bird img {
+  position: absolute;
+  top: -47.24%;
+  left: 0.2%;
+  width: 231.06%;
+  max-width: none;
+  height: 147.23%;
+}
+
+.typeSamples {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.typeSamples .bodyText {
+  color: var(--wizzin-text);
+}
+
+.titleSample {
+  font-family: var(--wizzin-font-titles);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.14;
+  color: var(--wizzin-text);
+}
+
+.symbols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 14px 0 0;
+  list-style: none;
+}
+
+.symbols li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 138px;
+}
+
+.potions img {
+  rotate: -4deg;
+}
+
+.crystals img {
+  rotate: 6deg;
+}
+
+.shapeshift img {
+  rotate: -7deg;
+}
+
+.protection img {
+  rotate: -1.09deg;
+}
+
+/* The blue shield: a blue oval cut to the shield's shape. */
+.shield {
+  mask-image: url("./assets/shield-mask.png");
+  mask-mode: alpha;
+  mask-repeat: no-repeat;
+  mask-position: 6.944px 0.933px;
+  mask-size: 134.196px 140.988px;
+}

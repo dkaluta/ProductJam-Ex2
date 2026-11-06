@@ -1,0 +1,40 @@
+.sides {
+  display: flex;
+  align-items: stretch;
+}
+
+.side {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 8px;
+  border: 1px solid color-mix(in srgb, var(--wizzin-purple) 70%, transparent);
+  border-radius: 15px;
+  font-family: var(--wizzin-font-body);
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.title {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 400;
+  line-height: inherit;
+  color: var(--wizzin-purple);
+}
+
+.text {
+  color: var(--wizzin-text);
+}
+
+.exchange {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--wizzin-purple);
+}

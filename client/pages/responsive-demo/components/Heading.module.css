@@ -1,0 +1,15 @@
+.heading {
+  font-family: var(--wizzin-font-titles);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.14;
+  text-wrap: wrap;
+}
+
+.light {
+  color: var(--wizzin-pink);
+}
+
+.accent {
+  color: var(--wizzin-purple);
+}

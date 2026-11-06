@@ -39,3 +39,7 @@ npm-debug.log*
 
 # Test output
 coverage/
+
+# Paid fonts - licensed, so not in the repo. `npm run deploy` downloads them
+# from FONTS_BASE_URL (see scripts/fetch-fonts.mjs).
+client/public/fonts/

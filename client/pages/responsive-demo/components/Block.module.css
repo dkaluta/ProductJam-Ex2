@@ -1,0 +1,10 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 20px 22px;
+  border: 1px solid var(--wizzin-card-border);
+  border-radius: 15px;
+  background-color: var(--wizzin-card);
+  overflow: clip;
+}
