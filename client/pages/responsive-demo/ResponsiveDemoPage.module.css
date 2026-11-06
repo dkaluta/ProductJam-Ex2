@@ -3,8 +3,8 @@
 
   Fonts: the logo font, Manufacturing Consent, comes from Google Fonts.
   Fedra Serif and Narkiss Block are paid fonts in client/public/fonts/, which
-  is not in git - scripts/fetch-fonts.mjs fetches them for a deploy. If they
-  are missing, Frank Ruhl Libre and Rubik stand in.
+  is not in git - scripts/fonts.mjs unlocks them from fonts-encrypted/. If
+  they are missing, Frank Ruhl Libre and Rubik stand in.
 */
 @import url("https://fonts.googleapis.com/css2?family=Manufacturing+Consent&family=Frank+Ruhl+Libre:wght@500;700&display=swap");
 

@@ -40,6 +40,7 @@ npm-debug.log*
 # Test output
 coverage/
 
-# Paid fonts - licensed, so not in the repo. `npm run build` writes them
-# from build variables on Cloudflare (see scripts/fetch-fonts.mjs).
+# Paid fonts - licensed, so only encrypted copies are in the repo, in
+# fonts-encrypted/. `npm run build` unlocks them with FONTS_KEY (see
+# scripts/fonts.mjs).
 client/public/fonts/

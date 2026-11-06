@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "vite dev",
-    "build": "node scripts/fetch-fonts.mjs && vite build",
+    "build": "node --env-file-if-exists=.env scripts/fonts.mjs && vite build",
+    "fonts:encrypt": "node --env-file-if-exists=.env scripts/fonts.mjs encrypt",
     "preview": "npm run build && vite preview",
     "deploy": "npm run build && wrangler deploy -c dist/server/wrangler.json",
     "typecheck": "tsc -b",
