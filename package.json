@@ -7,9 +7,9 @@
   },
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "node scripts/fetch-fonts.mjs && vite build",
     "preview": "npm run build && vite preview",
-    "deploy": "node scripts/fetch-fonts.mjs && vite build && wrangler deploy -c dist/server/wrangler.json",
+    "deploy": "npm run build && wrangler deploy -c dist/server/wrangler.json",
     "typecheck": "tsc -b",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
