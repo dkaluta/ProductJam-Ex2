@@ -15,6 +15,12 @@
 
   // The server entry point. This file runs on Cloudflare, NOT in the browser.
   "main": "./server/index.ts",
+  
+  "vars": {
+    "VITE_SHOW_DEMOS": "false",
+    "VITE_SUPABASE_PUBLISHABLE_KEY": "sb_publishable_0A6g6iSTo5S83pwL4YTPcA_DK0F1cL4",
+    "VITE_SUPABASE_URL": "https://qsbvdfoczxzhitmnphaw.supabase.co"
+  },
 
   "assets": {
     // Note: there is deliberately no "directory" here. The Vite plugin fills it
