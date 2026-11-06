@@ -8,3 +8,45 @@
   background-color: var(--wizzin-card);
   overflow: clip;
 }
+
+/* Phones: the wrappers vanish from the layout, so the columns' contents
+   follow each other as direct parts of the card - the phone design. */
+.columns,
+.column {
+  display: contents;
+}
+
+/* Desktop ("Desktop · 1442"): two 340px columns, 76px apart. */
+@media (min-width: 900px) {
+  .block {
+    gap: 28px;
+    border-color: #272727;
+    background-color: rgb(19 19 19 / 0.8);
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 340px));
+    justify-content: space-between;
+    align-items: start;
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* rows: the parts fill the grid column by column - first column's two
+     parts on the right, the second column's on the left - so each row
+     starts at the same height on both sides. */
+  .rows {
+    grid-template-rows: auto auto;
+    grid-auto-flow: column;
+    row-gap: 24px;
+  }
+
+  .rows > .column {
+    display: contents;
+  }
+}

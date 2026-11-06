@@ -38,3 +38,10 @@
   font-weight: 700;
   color: var(--wizzin-purple);
 }
+
+/* Desktop ("Desktop · 1442"): 8px of space under the two boxes. */
+@media (min-width: 900px) {
+  .sides {
+    padding-bottom: 8px;
+  }
+}

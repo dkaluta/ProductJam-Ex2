@@ -1,5 +1,6 @@
 /*
-  wizzin - from the Figma frame "חשבונית אפיון" (440px wide, phone only for now).
+  wizzin - from the Figma frames "חשבונית אפיון" (phones) and "Desktop · 1442"
+  (900px and up, at the end of this file).
 
   Fonts: the logo font, Manufacturing Consent, comes from Google Fonts.
   Fedra Serif and Narkiss Block are paid fonts, cut down to this page's
@@ -298,4 +299,151 @@
   mask-repeat: no-repeat;
   mask-position: 6.944px 0.933px;
   mask-size: 134.196px 140.988px;
+}
+
+/* The palette under "צבעוניות" - desktop only, the phone design has none. */
+.palette {
+  display: none;
+}
+
+/* =========================================================================
+   DESKTOP - from the Figma frame "Desktop · 1442", at 900px and up.
+   Everything below 900px is the phone design above, unchanged.
+   Two changes from the frame: the palette shows each colour's hex code,
+   and the four symbols sit in one row.
+   ========================================================================= */
+@media (min-width: 900px) {
+  .page {
+    /* The picture is max(1440px, the window) wide. One copy of it is 0.666
+       of that tall; the seams between copies get a dark band, 120px each way
+       at 1440px. */
+    --tile-width: max(1440px, 100vw);
+    --copy: calc(var(--tile-width) * 0.6659);
+    --band: calc(var(--tile-width) * 0.0833);
+
+    padding: 21px 24px 65px;
+    background:
+      /* The dark strip behind the label at the very top. */
+      linear-gradient(to bottom, rgb(0 0 0 / 0.76), transparent 81px),
+      /* Dark bands over the seams between copies of the picture. */
+        linear-gradient(
+          to bottom,
+          transparent calc(var(--copy) - var(--band)),
+          rgb(0 0 0 / 0.95) var(--copy),
+          transparent calc(var(--copy) + var(--band)),
+          transparent calc(var(--copy) * 2 - var(--band)),
+          rgb(0 0 0 / 0.95) calc(var(--copy) * 2),
+          transparent calc(var(--copy) * 2 + var(--band)),
+          transparent calc(var(--copy) * 3 - var(--band)),
+          rgb(0 0 0 / 0.95) calc(var(--copy) * 3),
+          transparent calc(var(--copy) * 3 + var(--band)),
+          transparent calc(var(--copy) * 4 - var(--band)),
+          rgb(0 0 0 / 0.95) calc(var(--copy) * 4),
+          transparent calc(var(--copy) * 4 + var(--band))
+        ),
+      /* The fade, darker towards the content. */
+        linear-gradient(
+          to bottom,
+          rgb(0 0 0 / 0.1),
+          rgb(0 0 0 / 0.4) 541px,
+          rgb(0 0 0 / 0.78) 851px,
+          rgb(0 0 0 / 0.82) 2769px
+        ),
+      /* The tapestry without the title in it, every other copy mirrored. */
+        image-set(
+          url("./assets/tapestry-desktop-1x.webp") 1x,
+          url("./assets/tapestry-desktop-2x.webp") 2x
+        )
+        center top / var(--tile-width) auto repeat-y,
+      black;
+  }
+
+  .content {
+    gap: 30px;
+    max-width: 802px;
+  }
+
+  /* Header: everything centred, one big logo, the colours as one stripe. */
+  .header {
+    align-items: center;
+    gap: 0;
+    margin-bottom: 23px;
+    padding-inline: 0;
+    text-align: center;
+  }
+
+  .appName {
+    align-self: center;
+    margin-top: 185px;
+    font-size: 298.953px;
+    line-height: 0.85;
+    text-align: center;
+  }
+
+  .description {
+    max-width: 531px;
+    min-height: 164px;
+    margin-top: 44px;
+    font-size: 28px;
+    line-height: 1.14;
+  }
+
+  .colors {
+    align-self: stretch;
+    margin-top: 78px;
+  }
+
+  .colors span {
+    flex: 1;
+    height: 22px;
+  }
+
+  /* 03: on desktop the text comes before the portraits, in a 116px row. */
+  .audienceBlock .portraits {
+    order: 1;
+    height: 116px;
+  }
+
+  /* 04: the palette, with each colour's hex code under it. */
+  .palette {
+    display: flex;
+    gap: 12px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .palette li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--wizzin-text);
+    direction: ltr;
+  }
+
+  .swatch {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+  }
+
+  /* The dark one gets a faint ring, so it shows against the dark card. */
+  .palette li:first-child .swatch {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4);
+  }
+
+  /* 04: the four symbols in one row, at about half size. */
+  .symbols {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .symbols li {
+    height: 90px;
+  }
+
+  /* zoom (not width) so the shield's cut-out shape shrinks with it. */
+  .symbols img {
+    zoom: 0.55;
+  }
 }
