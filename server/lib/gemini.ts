@@ -21,6 +21,12 @@ const geminiResponseSchema = z.object({
     .min(1),
 });
 
+function describe(error: unknown) {
+  return error instanceof Error
+    ? `${error.name}: ${error.message}`
+    : String(error);
+}
+
 export async function explainPicture(
   picture: SpacePicture,
   apiKey: string,
@@ -77,7 +83,8 @@ export async function explainPicture(
     }
     body = await response.json();
   } catch (error) {
-    console.error("Gemini request failed:", error);
+    // A plain string: Workers logs show an Error object's stack, not its message.
+    console.error(`Gemini request failed: ${describe(error)}`);
     throw new GeminiError("gemini_unavailable");
   }
   let explanation;
@@ -88,7 +95,7 @@ export async function explainPicture(
       .join("");
     explanation = explanationSchema.parse(JSON.parse(text));
   } catch (error) {
-    console.error("Gemini returned invalid output:", error);
+    console.error(`Gemini returned invalid output: ${describe(error)}`);
     throw new GeminiError("invalid_ai_output");
   }
   return explanation;
