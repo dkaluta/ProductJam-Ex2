@@ -69,9 +69,15 @@ export async function explainPicture(
         }),
       },
     );
-    if (!response.ok) throw new Error("Gemini request failed");
+    if (!response.ok) {
+      // Google's error body names the cause (bad key, unknown model, quota) and
+      // never contains the key, so it is safe to log for Workers observability.
+      const detail = (await response.text()).slice(0, 1000);
+      throw new Error(`Gemini ${model} returned ${response.status}: ${detail}`);
+    }
     body = await response.json();
-  } catch {
+  } catch (error) {
+    console.error("Gemini request failed:", error);
     throw new GeminiError("gemini_unavailable");
   }
   let explanation;
@@ -81,7 +87,8 @@ export async function explainPicture(
       .map((part) => part.text)
       .join("");
     explanation = explanationSchema.parse(JSON.parse(text));
-  } catch {
+  } catch (error) {
+    console.error("Gemini returned invalid output:", error);
     throw new GeminiError("invalid_ai_output");
   }
   return explanation;
