@@ -237,6 +237,29 @@ describe("NASA proxy security", () => {
     expect(geminiCalls).toBe(1);
     expect(saved).toBeUndefined();
   });
+  it("retries Gemini when it is too busy to start, which is not billed", async () => {
+    vi.useFakeTimers({ toFake: ["setTimeout"] });
+    try {
+      const realFetch = vi.mocked(fetch).getMockImplementation()!;
+      let busy = 2;
+      vi.mocked(fetch).mockImplementation(async (input, init) => {
+        const url = new URL(input instanceof Request ? input.url : input);
+        if (url.hostname === "generativelanguage.googleapis.com" && busy > 0) {
+          busy--;
+          geminiCalls++;
+          return Response.json({ error: "high demand" }, { status: 503 });
+        }
+        return realFetch(input, init);
+      });
+      const pending = explain(picture.date);
+      await vi.runAllTimersAsync();
+      expect((await pending).status).toBe(200);
+      expect(geminiCalls).toBe(3);
+      expect(saved).toMatchObject(explanation);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
   it("does not pay when the database cannot acquire a claim", async () => {
     failClaim = true;
     expect((await explain(picture.date)).status).toBe(500);
