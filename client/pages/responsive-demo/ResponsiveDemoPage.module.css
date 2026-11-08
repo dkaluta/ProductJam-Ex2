@@ -309,8 +309,7 @@
 /* =========================================================================
    DESKTOP - from the Figma frame "Desktop · 1442", at 900px and up.
    Everything below 900px is the phone design above, unchanged.
-   Two changes from the frame: the palette shows each colour's hex code,
-   and the four symbols sit in one row.
+   One change from the frame: the palette shows each colour's hex code.
    ========================================================================= */
 @media (min-width: 900px) {
   .page {
@@ -431,19 +430,5 @@
   /* The dark one gets a faint ring, so it shows against the dark card. */
   .palette li:first-child .swatch {
     box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.4);
-  }
-
-  /* 04: the four symbols in one row, at about half size. */
-  .symbols {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .symbols li {
-    height: 90px;
-  }
-
-  /* zoom (not width) so the shield's cut-out shape shrinks with it. */
-  .symbols img {
-    zoom: 0.55;
   }
 }

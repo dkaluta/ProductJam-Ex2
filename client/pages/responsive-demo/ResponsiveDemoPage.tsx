@@ -29,7 +29,7 @@ const PALETTE = [
 /**
  * wizzin - the product spec from the Figma file "חשבונית אפיון", as a page.
  * Phones follow the 440px frame; 900px and up follows "Desktop · 1442",
- * plus hex codes on the palette and the symbols in one row.
+ * plus hex codes on the palette.
  */
 export default function ResponsiveDemoPage() {
   return (
