@@ -39,7 +39,7 @@
   --wizzin-font-body: "Narkiss Block", "Rubik", sans-serif;
 
   min-height: 100vh;
-  padding: 482px 27px 86px;
+  padding: 442px 27px 86px;
   /* The tapestry, darkened from just under the top picture downwards. */
   background:
     linear-gradient(to bottom, transparent 295px, rgb(0 0 0 / 0.77) 561px),
