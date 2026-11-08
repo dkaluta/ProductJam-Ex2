@@ -28,8 +28,7 @@ const PALETTE = [
 
 /**
  * wizzin - the product spec from the Figma file "חשבונית אפיון", as a page.
- * Phones follow the 440px frame; 900px and up follows "Desktop · 1442",
- * plus hex codes on the palette.
+ * Phones follow the 440px frame; 900px and up follows "Desktop · 1442".
  */
 export default function ResponsiveDemoPage() {
   return (
@@ -150,7 +149,6 @@ export default function ResponsiveDemoPage() {
           tag="04 · שפה גרפית"
           id="design"
           className={styles.designBlock}
-          rows
           columns={[
             <>
               <Topic label="השראה" text="איורים מימי הביניים של יצורי פלא">

@@ -36,17 +36,4 @@
     flex-direction: column;
     gap: 24px;
   }
-
-  /* rows: the parts fill the grid column by column - first column's two
-     parts on the right, the second column's on the left - so each row
-     starts at the same height on both sides. */
-  .rows {
-    grid-template-rows: auto auto;
-    grid-auto-flow: column;
-    row-gap: 24px;
-  }
-
-  .rows > .column {
-    display: contents;
-  }
 }

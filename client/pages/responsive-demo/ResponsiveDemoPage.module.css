@@ -309,7 +309,6 @@
 /* =========================================================================
    DESKTOP - from the Figma frame "Desktop · 1442", at 900px and up.
    Everything below 900px is the phone design above, unchanged.
-   One change from the frame: the palette shows each colour's hex code.
    ========================================================================= */
 @media (min-width: 900px) {
   .page {
@@ -406,7 +405,7 @@
   /* 04: the palette, with each colour's hex code under it. */
   .palette {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     padding: 0;
     list-style: none;
   }
@@ -415,9 +414,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--wizzin-text);
+    gap: 8px;
+    width: 60px;
+    font-size: 14px;
+    line-height: 1.3;
+    white-space: nowrap;
+    color: var(--wizzin-pink);
     direction: ltr;
   }
 

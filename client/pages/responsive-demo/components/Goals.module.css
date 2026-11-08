@@ -46,9 +46,9 @@
   line-height: 1;
 }
 
-/* Desktop ("Desktop · 1442"): the box is 170px tall, as in the frame. */
+/* Desktop ("Desktop · 1442"): the box is 153px tall, as in the frame. */
 @media (min-width: 900px) {
   .goals {
-    min-height: 170px;
+    min-height: 153px;
   }
 }
