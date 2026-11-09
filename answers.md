@@ -30,6 +30,25 @@ that? Where does the server get `owner_id` from, and why not from the request
 body?
 
 **Answer:**
+Here are the steps for event creation:
+1. The function `handleSubmit` in `EventForm.tsx` calls `preventDefault()` 
+and passes the form values to `onSubmit`
+2. `EventNewPage`’s `onSubmit` calls `createEvent.mutate(…)`
+3. Which then `POST`s to the event API
+4. While getting the Supabase session token, adding authorization and calling `fetch`
+
+Everything below this is on the server
+5. `app.use(“/api/*”, requireAuth)` is run
+6. The token’s signature is verified, then `c.set(“user”, { id: payload.sub, ... })`
+7. First `validate(“json”, createEventSchema)` runs, then the handler runs `.insert({ ...input, owner_id: c.get(“user”).id })`  and returns `c.json(created, 201)` — success!.
+
+Now back to the client
+8. `onSuccess`, upon receiving the 201 calls `invalidateQueries({ queryKey: [“events”] })`
+
+A title of only spaces returns `400 Invalid Input` with the message “Please enter a title” 
+
+Owner ID comes from `c.get(“user).id`, and is not taken from the body.
+
 
 ## 2. The rules
 
