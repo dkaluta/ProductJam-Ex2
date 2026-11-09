@@ -5,6 +5,8 @@ that stores data in a database and runs on the internet for free.
 
 New here? Start with **[docs/01-quickstart.md](docs/01-quickstart.md)**.
 
+The app is hosted [here](https://ng-dk-productjam-ex2.davidkaluta.workers.dev)
+
 ## How the code is organised
 
 There are three folders, and every file belongs to exactly one of them. Knowing
